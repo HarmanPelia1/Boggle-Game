@@ -278,7 +278,6 @@ private:
         double r_alpha;
         HASH_INDEX_T del_count;
         HASH_INDEX_T num_obj;
-        int size_;
         
 };
 
@@ -300,7 +299,7 @@ template<typename K, typename V, typename Prober, typename Hash, typename KEqual
 HashTable<K,V,Prober,Hash,KEqual>::HashTable(
     double resizeAlpha, const Prober& prober, const Hasher& hash, const KEqual& kequal)
        :  hash_(hash), kequal_(kequal), prober_(prober), r_alpha(resizeAlpha), num_obj(0),
-        totalProbes_(0), mIndex_(0), del_count(0), size_(0)
+        totalProbes_(0), mIndex_(0), del_count(0)
 {
     // Initialize any other data members as necessary
 
@@ -346,7 +345,7 @@ void HashTable<K,V,Prober,Hash,KEqual>::insert(const ItemType& p)
     HASH_INDEX_T location = this->probe(p.first);
 
     if(location != npos){
-        if ( double(num_obj)/CAPACITIES[mIndex_] >= r_alpha) {
+        if (double(num_obj)/CAPACITIES[mIndex_] >= r_alpha) {
             resize();
             insert(p);
             return;
@@ -357,7 +356,9 @@ void HashTable<K,V,Prober,Hash,KEqual>::insert(const ItemType& p)
         num_obj++;
     }
     else{
+
         throw std::logic_error("Cannot insert");
+
     }
 
 }
@@ -367,6 +368,7 @@ template<typename K, typename V, typename Prober, typename Hash, typename KEqual
 void HashTable<K,V,Prober,Hash,KEqual>::remove(const KeyType& key)
 {
     HashItem* h = internalFind(key);
+
     if(h == nullptr) return;
 
     h->deleted = true;
@@ -382,7 +384,9 @@ typename HashTable<K,V,Prober,Hash,KEqual>::ItemType const * HashTable<K,V,Probe
 {
     HASH_INDEX_T h = this->probe(key);
     if((npos == h) || nullptr == table_[h] ){
+
         return nullptr;
+
     }
     return &table_[h]->item;
 }
@@ -454,9 +458,11 @@ void HashTable<K,V,Prober,Hash,KEqual>::resize()
     this->del_count = 0;
 
     for(auto& item : previousTable){
-        if(item != nullptr && !item->deleted) {
+        if(item != nullptr && !item->deleted){
+
             this->insert(item->item);
             delete item;
+
         }
     }
     
